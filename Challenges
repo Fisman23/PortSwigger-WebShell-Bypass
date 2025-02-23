@@ -1,0 +1,35 @@
+# Retos Enfrentados
+
+Aquí están los principales problemas que encontré al resolver el laboratorio y cómo los superé:
+
+1. **Dependencias Faltantes**  
+   - Error: `ModuleNotFoundError: No module named 'bs4'`.  
+   - Solución: Instalé `requests` y `beautifulsoup4` con `pip install -r requirements.txt`.
+
+2. **Errores de Sintaxis**  
+   - Error: `SyntaxError: unterminated string literal` (ejemplo: línea 62).  
+   - Solución: Corregí cierres de comillas y paréntesis.
+
+3. **Token CSRF Incorrecto**  
+   - Error: `AttributeError: 'NoneType' object has no attribute 'group'`.  
+   - Solución: Usé Beautiful Soup con el nombre correcto "csrf".
+
+4. **Métodos HTTP Erróneos**  
+   - Error: "Method not allowed" (405).  
+   - Solución: GET a `/my-account`, POST a `/my-account/avatar`.
+
+5. **Parámetro Faltante**  
+   - Error: "No user param supplied".  
+   - Solución: Añadí `"user": "wiener"` al POST.
+
+6. **Verificación Específica**  
+   - Error: Falló detectar la subida por mensaje incorrecto.  
+   - Solución: Usé `status_code` y "exploit.php" como chequeo.
+
+7. **Acceso al Archivo**  
+   - Error: 404 o código PHP crudo.  
+   - Solución: Usé `exploit.php` con `image/jpeg`.
+
+8. **Timeout del Servidor**  
+   - Error: "Read timeout".  
+   - Solución: Reintentos con `try-except`.
