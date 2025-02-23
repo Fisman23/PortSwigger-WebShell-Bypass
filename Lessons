@@ -1,0 +1,27 @@
+# Lecciones Aprendidas
+
+Estas son las lecciones que extraje del proceso:
+
+1. **Inspecciona el HTML**  
+   - Confirma nombres de campos y mensajes con el navegador o guardando respuestas.
+
+2. **Sigue el Flujo Manual**  
+   - Replica los pasos del usuario para automatizar correctamente.
+
+3. **Adapta Métodos HTTP**  
+   - Usa GET para ver, POST para enviar; ajusta según errores.
+
+4. **Engaña Filtros**  
+   - Combina `Content-Type` permitido con extensiones ejecutables.
+
+5. **Depuración Esencial**  
+   - Guarda HTML y usa `print` para entender al servidor.
+
+6. **Flexibilidad en Respuestas**  
+   - No busques frases exactas; usa condiciones generales.
+
+7. **Maneja Errores del Servidor**  
+   - Reintenta ante timeouts o fallos temporales.
+
+8. **Itera y Aprende**  
+   - Cada error enseña; ajusta y prueba hasta resolver.
